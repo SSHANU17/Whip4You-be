@@ -33,7 +33,12 @@ async function startServer() {
 
   app.use(
     cors({
-      origin: process.env.CORS_ORIGIN || '*',
+      origin: [
+        'https://www.whip4you.ca',
+        'https://whip4-you-nv3j.vercel.app',
+        process.env.CORS_ORIGIN || 'http://localhost:3000',
+      ],
+      credentials: true,
     })
   );
 
