@@ -50,6 +50,9 @@ async function startServer() {
 
   app.use(express.json());
 
+  // Root route
+  app.get('/', (_req, res) => res.json({ message: 'WHIP4YOU API - Premium Used Car Dealership Backend', version: '1.0.0' }));
+
   app.use('/api/auth', authRoutes);
   app.use('/api/leads', leadRoutes);
   app.use('/api/vehicles', vehicleRoutes);

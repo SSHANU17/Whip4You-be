@@ -23,9 +23,15 @@ const updateLead = async (req, res) => {
   try {
     const lead = await Lead.findById(req.params.id);
     if (lead) {
-      lead.status = req.body.status || lead.status;
-      lead.remarks = req.body.remarks || lead.remarks;
-      lead.priority = req.body.priority || lead.priority;
+      if (typeof req.body.status !== 'undefined') {
+        lead.status = req.body.status;
+      }
+      if (Object.prototype.hasOwnProperty.call(req.body, 'remarks')) {
+        lead.remarks = req.body.remarks;
+      }
+      if (typeof req.body.priority !== 'undefined') {
+        lead.priority = req.body.priority;
+      }
       const updatedLead = await lead.save();
       res.json(updatedLead);
     } else {
