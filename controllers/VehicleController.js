@@ -1,4 +1,3 @@
-
 import Vehicle from '../models/Vehicle.js';
 
 const getVehicles = async (req, res) => {
@@ -25,7 +24,13 @@ const getVehicleById = async (req, res) => {
 
 const createVehicle = async (req, res) => {
   try {
-    const vehicle = await Vehicle.create(req.body);
+    const vehicleData = { ...req.body };
+    if (vehicleData.isNewArrival !== false && !vehicleData.newArrivalExpiryDate) {
+      const expiry = new Date();
+      expiry.setDate(expiry.getDate() + 14);
+      vehicleData.newArrivalExpiryDate = expiry;
+    }
+    const vehicle = await Vehicle.create(vehicleData);
     res.status(201).json(vehicle);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -37,6 +42,12 @@ const updateVehicle = async (req, res) => {
     const vehicle = await Vehicle.findById(req.params.id);
     if (vehicle) {
       Object.assign(vehicle, req.body);
+      // Auto-set expiry when isNewArrival is turned on and no expiry is set
+      if (req.body.isNewArrival === true && !req.body.newArrivalExpiryDate && !vehicle.newArrivalExpiryDate) {
+          const expiry = new Date();
+          expiry.setDate(expiry.getDate() + 14);
+          vehicle.newArrivalExpiryDate = expiry;
+      }
       const updatedVehicle = await vehicle.save();
       res.json(updatedVehicle);
     } else {

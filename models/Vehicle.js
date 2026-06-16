@@ -21,7 +21,12 @@ const vehicleSchema = new mongoose.Schema({
   description: { type: String },
   condition: { type: String, enum: ['New', 'Used', 'Certified'], default: 'Used' },
   status: { type: String, enum: ['Available', 'Pending', 'Sold'], default: 'Available' },
-  trim: { type: String }
+  trim: { type: String },
+  showPrice: { type: Boolean, default: true },
+  actualPrice: { type: Number },
+  isHidden: { type: Boolean, default: false },
+  isNewArrival: { type: Boolean, default: true },
+  newArrivalExpiryDate: { type: Date }
 }, {
   timestamps: true
 });

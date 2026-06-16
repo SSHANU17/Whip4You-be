@@ -6,7 +6,8 @@ const configSchema = new mongoose.Schema({
   promoRate: { type: String, default: '4.99' },
   contactEmail: { type: String, default: 'Whip4youauto@gmail.com' },
   contactPhone: { type: String, default: '(555) 012-3456' },
-  address: { type: String, default: '123 Luxury Lane, Beverly Hills, CA 90210' }
+  address: { type: String, default: '123 Luxury Lane, Beverly Hills, CA 90210' },
+  inventoryGridSize: { type: Number, default: 12 }
 }, {
   timestamps: true
 });
