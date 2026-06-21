@@ -33,10 +33,12 @@ async function startServer() {
     })
   );
 
-  // configure CORS - allow frontend origin or default to all
   app.use(
     cors({
-      origin: process.env.CORS_ORIGIN || '*',
+      origin: (origin, callback) => {
+        callback(null, true);
+      },
+      credentials: true,
     })
   );
 
