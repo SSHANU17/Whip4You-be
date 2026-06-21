@@ -23,8 +23,7 @@ const connectDB = async () => {
       console.log(`👤 Default admin user seeded: ${adminEmail}`);
     }
   } catch (error) {
-    console.error(`❌ Error: ${error.message}`);
-    process.exit(1);
+    console.error(`❌ MongoDB Connection Error: ${error.message}`);
   }
 };
 

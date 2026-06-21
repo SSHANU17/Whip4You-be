@@ -21,7 +21,7 @@ dotenv.config();
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
 async function startServer() {
-  await connectDB();
+  connectDB().catch(err => console.error("Asynchronous DB connection failed:", err));
   configureCloudinary();
 
   const app = express();
