@@ -61,7 +61,7 @@ async function startServer() {
   app.use(errorHandler);
 
   app.listen(PORT, '0.0.0.0', () => {
-    logger.info(`🚀 MILESTONE MOTORS API listening on port ${PORT}`);
+    logger.info(`🚀 WHIP4YOU API listening on port ${PORT}`);
   });
 }
 

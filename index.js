@@ -43,7 +43,7 @@ async function startServer() {
   app.use(express.json());
 
   // Root route
-  app.get('/', (_req, res) => res.json({ message: 'MILESTONE MOTORS API - Premium Used Car Dealership Backend', version: '1.0.0' }));
+  app.get('/', (_req, res) => res.json({ message: 'WHIP4YOU API - Premium Used Car Dealership Backend', version: '1.0.0' }));
 
   app.use('/api', dbCheckMiddleware);
 
@@ -61,7 +61,7 @@ async function startServer() {
 
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, '0.0.0.0', () => {
-    logger.info(`🚀 MILESTONE MOTORS API listening on port ${PORT}`);
+    logger.info(`🚀 WHIP4YOU API listening on port ${PORT}`);
   });
 }
 
