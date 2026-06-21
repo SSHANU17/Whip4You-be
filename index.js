@@ -16,6 +16,7 @@ import authRoutes from './routes/authRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
 import configRoutes from './routes/configRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
+import dbCheckMiddleware from './middleware/dbCheckMiddleware.js';
 
 dotenv.config();
 
@@ -31,15 +32,7 @@ async function startServer() {
     })
   );
 
-  app.use(
-    cors({
-      origin: (origin, callback) => {
-        // Allow any request origin dynamically to support multiple client domains and preview environments
-        callback(null, true);
-      },
-      credentials: true,
-    })
-  );
+  app.use(cors({ origin: '*' }));
 
   app.use(
     morgan('combined', {
@@ -51,6 +44,8 @@ async function startServer() {
 
   // Root route
   app.get('/', (_req, res) => res.json({ message: 'MILESTONE MOTORS API - Premium Used Car Dealership Backend', version: '1.0.0' }));
+
+  app.use('/api', dbCheckMiddleware);
 
   app.use('/api/auth', authRoutes);
   app.use('/api/leads', leadRoutes);

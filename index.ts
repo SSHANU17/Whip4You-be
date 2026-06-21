@@ -15,6 +15,7 @@ import authRoutes from './routes/authRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
 import configRoutes from './routes/configRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
+import dbCheckMiddleware from './middleware/dbCheckMiddleware.js';
 
 dotenv.config();
 
@@ -33,14 +34,7 @@ async function startServer() {
     })
   );
 
-  app.use(
-    cors({
-      origin: (origin, callback) => {
-        callback(null, true);
-      },
-      credentials: true,
-    })
-  );
+  app.use(cors({ origin: '*' }));
 
   // request logging
   app.use(
@@ -52,6 +46,8 @@ async function startServer() {
   app.use(express.json());
 
   // api routes
+  app.use('/api', dbCheckMiddleware);
+
   app.use('/api/auth', authRoutes);
   app.use('/api/leads', leadRoutes);
   app.use('/api/vehicles', vehicleRoutes);
