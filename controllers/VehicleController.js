@@ -2,7 +2,18 @@ import Vehicle from '../models/Vehicle.js';
 
 const getVehicles = async (req, res) => {
   try {
-    const vehicles = await Vehicle.find({}).sort({ createdAt: -1 });
+    const vehicles = await Vehicle.aggregate([
+      {
+        $addFields: {
+          isSold: {
+            $cond: { if: { $eq: ["$status", "Sold"] }, then: 1, else: 0 }
+          }
+        }
+      },
+      {
+        $sort: { isSold: 1, createdAt: -1 }
+      }
+    ]);
     res.json(vehicles);
   } catch (error) {
     res.status(500).json({ message: error.message });
