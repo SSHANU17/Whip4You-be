@@ -12,6 +12,23 @@ const UPLOAD_IMAGE_TRANSFORMATION = [
   },
 ];
 
+// Pre-generate the formats selected by f_auto at delivery time. This has no
+// sizing or cropping transformation, and runs after the upload response so an
+// admin is never kept waiting for format conversion to finish.
+const EAGER_DELIVERY_TRANSFORMATIONS = [
+  {
+    fetch_format: 'avif',
+    quality: 'auto:best',
+    format: '',
+  },
+  {
+    fetch_format: 'webp',
+    flags: 'awebp',
+    quality: 'auto:best',
+    format: '',
+  },
+];
+
 const uploadImage = async (req, res) => {
   try {
     if (!req.file) {
@@ -32,6 +49,8 @@ const uploadImage = async (req, res) => {
       folder: 'whip4you',
       resource_type: 'image',
       transformation: UPLOAD_IMAGE_TRANSFORMATION,
+      eager: EAGER_DELIVERY_TRANSFORMATIONS,
+      eager_async: true,
     });
 
     res.json({ url: result.secure_url, publicId: result.public_id });
