@@ -1,5 +1,29 @@
 import Vehicle from '../models/Vehicle.js';
 
+const CLOUDINARY_UPLOAD_PATH = '/image/upload/';
+const DELIVERY_OPTIMIZATION = 'f_auto,q_auto:best';
+
+// Keep the stored asset URL unchanged, but deliver Cloudinary images using the
+// browser's best supported format and content-aware, high-quality compression.
+// No width, height, crop, or DPR transformations are applied.
+const getOptimizedImageUrl = (url) => {
+  if (typeof url !== 'string' || !url.includes('res.cloudinary.com')) return url;
+  if (url.includes(`/${DELIVERY_OPTIMIZATION}/`)) return url;
+
+  return url.replace(
+    CLOUDINARY_UPLOAD_PATH,
+    `${CLOUDINARY_UPLOAD_PATH}${DELIVERY_OPTIMIZATION}/`
+  );
+};
+
+const optimizeVehicleImages = (vehicle) => {
+  const data = typeof vehicle.toObject === 'function' ? vehicle.toObject() : vehicle;
+  return {
+    ...data,
+    images: Array.isArray(data.images) ? data.images.map(getOptimizedImageUrl) : data.images,
+  };
+};
+
 const getVehicles = async (req, res) => {
   try {
     const vehicles = await Vehicle.aggregate([
@@ -14,7 +38,7 @@ const getVehicles = async (req, res) => {
         $sort: { isSold: 1, createdAt: -1 }
       }
     ]);
-    res.json(vehicles);
+    res.json(vehicles.map(optimizeVehicleImages));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -24,7 +48,7 @@ const getVehicleById = async (req, res) => {
   try {
     const vehicle = await Vehicle.findById(req.params.id);
     if (vehicle) {
-      res.json(vehicle);
+      res.json(optimizeVehicleImages(vehicle));
     } else {
       res.status(404).json({ message: 'Vehicle not found' });
     }
