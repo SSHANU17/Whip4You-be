@@ -35,7 +35,12 @@ const getVehicles = async (req, res) => {
         }
       },
       {
-        $sort: { isSold: 1, createdAt: -1 }
+        $addFields: {
+          displayOrderSort: { $ifNull: ['$displayOrder', 2147483647] }
+        }
+      },
+      {
+        $sort: { isSold: 1, displayOrderSort: 1, createdAt: -1 }
       }
     ]);
     res.json(vehicles.map(optimizeVehicleImages));
@@ -65,8 +70,31 @@ const createVehicle = async (req, res) => {
       expiry.setDate(expiry.getDate() + 14);
       vehicleData.newArrivalExpiryDate = expiry;
     }
+    if (typeof vehicleData.displayOrder !== 'number') {
+      const lastOrderedVehicle = await Vehicle.findOne({ displayOrder: { $ne: null } }).sort({ displayOrder: -1 }).select('displayOrder');
+      vehicleData.displayOrder = (lastOrderedVehicle?.displayOrder ?? Date.now()) + 1;
+    }
     const vehicle = await Vehicle.create(vehicleData);
     res.status(201).json(vehicle);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const reorderVehicles = async (req, res) => {
+  try {
+    const { vehicleIds } = req.body;
+    if (!Array.isArray(vehicleIds) || vehicleIds.some(id => typeof id !== 'string')) {
+      return res.status(400).json({ message: 'vehicleIds must be an array of vehicle IDs' });
+    }
+    const uniqueIds = [...new Set(vehicleIds)];
+    if (uniqueIds.length !== vehicleIds.length) {
+      return res.status(400).json({ message: 'vehicleIds must not contain duplicates' });
+    }
+    await Promise.all(vehicleIds.map((id, displayOrder) =>
+      Vehicle.updateOne({ _id: id }, { $set: { displayOrder } })
+    ));
+    res.json({ message: 'Vehicle order updated' });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -107,4 +135,4 @@ const deleteVehicle = async (req, res) => {
   }
 };
 
-export { getVehicles, getVehicleById, createVehicle, updateVehicle, deleteVehicle };
+export { getVehicles, getVehicleById, createVehicle, updateVehicle, deleteVehicle, reorderVehicles };

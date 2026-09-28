@@ -25,6 +25,7 @@ const vehicleSchema = new mongoose.Schema({
   showPrice: { type: Boolean, default: true },
   actualPrice: { type: Number },
   isHidden: { type: Boolean, default: false },
+  displayOrder: { type: Number, default: null },
   isNewArrival: { type: Boolean, default: true },
   newArrivalExpiryDate: { type: Date }
 }, {

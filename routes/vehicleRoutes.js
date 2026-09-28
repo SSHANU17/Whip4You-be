@@ -5,13 +5,15 @@ import {
   getVehicleById, 
   createVehicle, 
   updateVehicle, 
-  deleteVehicle 
+  deleteVehicle,
+  reorderVehicles
 } from '../controllers/VehicleController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 router.route('/').get(getVehicles).post(protect, admin, createVehicle);
+router.patch('/reorder', protect, admin, reorderVehicles);
 router.route('/:id')
   .get(getVehicleById)
   .patch(protect, admin, updateVehicle)
