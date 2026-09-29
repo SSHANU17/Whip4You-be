@@ -17,6 +17,7 @@ import reviewRoutes from './routes/reviewRoutes.js';
 import configRoutes from './routes/configRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import dbCheckMiddleware from './middleware/dbCheckMiddleware.js';
+import Vehicle from './models/Vehicle.js';
 
 dotenv.config();
 
@@ -44,6 +45,27 @@ async function startServer() {
 
   // Root route
   app.get('/', (_req, res) => res.json({ message: 'WHIP4YOU API - Premium Used Car Dealership Backend', version: '1.0.0' }));
+
+  app.get('/api/sitemap.xml', async (_req, res) => {
+    try {
+      const site = (process.env.PUBLIC_SITE_URL || 'https://www.whip4you.com').replace(/\/$/, '');
+      const vehicles = await Vehicle.find({ status: 'Available', isHidden: { $ne: true } }).select('_id year make model images imageAlts updatedAt');
+      const escapeXml = value => String(value ?? '').replace(/[<>&'"]/g, char => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' })[char]);
+      const staticRoutes = ['', '/inventory', '/finance', '/calculator', '/about', '/contact'];
+      const urls = staticRoutes.map(path => `<url><loc>${site}${path}</loc></url>`);
+      for (const vehicle of vehicles) {
+        const loc = `${site}/vehicle/${vehicle._id}`;
+        const image = vehicle.images?.[0];
+        const imageTag = image ? `<image:image><image:loc>${escapeXml(image)}</image:loc><image:title>${escapeXml(vehicle.imageAlts?.[0] || `${vehicle.year} ${vehicle.make} ${vehicle.model} for sale in Surrey, BC`)}</image:title></image:image>` : '';
+        const lastmod = vehicle.updatedAt ? `<lastmod>${new Date(vehicle.updatedAt).toISOString()}</lastmod>` : '';
+        urls.push(`<url><loc>${loc}</loc>${lastmod}${imageTag}</url>`);
+      }
+      res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">${urls.join('')}</urlset>`);
+    } catch (error) {
+      logger.error(`Sitemap generation failed: ${error.message}`);
+      res.status(503).type('text/plain').send('Sitemap temporarily unavailable');
+    }
+  });
 
   app.use('/api', dbCheckMiddleware);
 

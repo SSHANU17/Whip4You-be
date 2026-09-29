@@ -17,6 +17,7 @@ const vehicleSchema = new mongoose.Schema({
   vin: { type: String, required: true, unique: true },
   stockNumber: { type: String, required: true, unique: true },
   images: [{ type: String }],
+  imageAlts: [{ type: String }],
   features: [{ type: String }],
   description: { type: String },
   condition: { type: String, enum: ['New', 'Used', 'Certified'], default: 'Used' },
