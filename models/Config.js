@@ -7,7 +7,8 @@ const configSchema = new mongoose.Schema({
   contactEmail: { type: String, default: 'Whip4youauto@gmail.com' },
   contactPhone: { type: String, default: '+1 7789706007' },
   address: { type: String, default: '20771 Langley Bypass #102, Langley, BC V3A 5E8' },
-  inventoryGridSize: { type: Number, default: 12 }
+  inventoryGridSize: { type: Number, default: 12 },
+  instagramPosts: { type: [String], default: [] }
 }, {
   timestamps: true
 });
