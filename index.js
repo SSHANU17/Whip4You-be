@@ -46,12 +46,12 @@ async function startServer() {
   // Root route
   app.get('/', (_req, res) => res.json({ message: 'WHIP4YOU API - Premium Used Car Dealership Backend', version: '1.0.0' }));
 
-  app.get('/api/sitemap.xml', async (_req, res) => {
+  const handleSitemap = async (_req, res) => {
     try {
       const site = (process.env.PUBLIC_SITE_URL || 'https://www.whip4you.com').replace(/\/$/, '');
       const vehicles = await Vehicle.find({ status: 'Available', isHidden: { $ne: true } }).select('_id year make model images imageAlts updatedAt');
       const escapeXml = value => String(value ?? '').replace(/[<>&'"]/g, char => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' })[char]);
-      const staticRoutes = ['', '/inventory', '/finance', '/calculator', '/about', '/contact'];
+      const staticRoutes = ['', '/inventory', '/finance', '/calculator', '/about', '/contact', '/trade-in', '/car-finder'];
       const urls = staticRoutes.map(path => `<url><loc>${site}${path}</loc></url>`);
       for (const vehicle of vehicles) {
         const loc = `${site}/vehicle/${vehicle._id}`;
@@ -65,7 +65,10 @@ async function startServer() {
       logger.error(`Sitemap generation failed: ${error.message}`);
       res.status(503).type('text/plain').send('Sitemap temporarily unavailable');
     }
-  });
+  };
+
+  app.get('/sitemap.xml', handleSitemap);
+  app.get('/api/sitemap.xml', handleSitemap);
 
   app.use('/api', dbCheckMiddleware);
 
